@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ses_opdracht_gradle-1.0-SNAPSHOT">
+    <CLASSES />
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/libs/ses_opdracht_gradle-1.0-SNAPSHOT.jar!/" />
+    </SOURCES>
+  </library>
+</component>
