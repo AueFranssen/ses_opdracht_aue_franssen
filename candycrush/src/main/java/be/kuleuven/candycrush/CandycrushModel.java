@@ -1,8 +1,9 @@
 package be.kuleuven.candycrush;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class CandycrushModel {
     private String speler;
@@ -14,7 +15,7 @@ public class CandycrushModel {
     public CandycrushModel(String speler,int width,int height) {
         this.speler = speler;
         candyBoard = new Board<>(boardsize);
-        boardsize = new Boardsize(width,height);
+        boardsize = new Boardsize(height,width);
         score = 0;
         loggedIn = false;
         Function<Position, Candy> candyCreator = position -> randomCandy();
@@ -33,7 +34,7 @@ public class CandycrushModel {
         };
     }
     public CandycrushModel(String speler){
-        this(speler,4,4);
+        this(speler,10,10);
     }
     public String getSpeler() {
         return speler;
@@ -65,18 +66,8 @@ public class CandycrushModel {
     }
     public void candyWithIndexSelected(Position position){
         Iterable<Position> Neighbours = getSameNeighbourPositions(position);
-        int size = 0;
-        for(Position Neighbour:Neighbours){
-            size++;
-        }
-        if(size > 2) {
-            for (Position Neighbour : Neighbours) {
-                candyBoard.replaceCellAt(Neighbour, randomCandy());
-                score++;
-            }
-        }
-        candyBoard.replaceCellAt(position, randomCandy());
-        score++;
+        candyBoard.replaceCellAt(position, new noCandy());
+        updateBoard();
     }
 
     Iterable<Position> getSameNeighbourPositions(Position position){
@@ -92,4 +83,113 @@ public class CandycrushModel {
         }
         return result;
     }
+    public boolean firstTwoHaveCandy(Candy candy, Stream<Position> positions){
+        return positions
+                .limit(2)
+                .allMatch(p -> candyBoard.getCellAt(p).equals(candy));
+    }
+    public Stream<Position> horizontalStartingPositions(){
+        return boardsize.positions().stream()
+                .filter(p -> {
+                    Stream<Position> buren = p.walkLeft();
+                    return !firstTwoHaveCandy(candyBoard.getCellAt(p), buren);
+                });
+    }
+    public Stream<Position> verticalStartingPositions(){
+        return boardsize.positions().stream()
+                .filter(p -> {
+                    Stream<Position> buren = p.walkUp();
+                    return !firstTwoHaveCandy(candyBoard.getCellAt(p), buren);
+                });
+    }
+    public List<Position> longestMatchToRight(Position pos){
+        Stream<Position> walked = pos.walkRight();
+        return walked
+                .takeWhile(p -> getSpeelbord().getCellAt(p).equals(getSpeelbord().getCellAt(pos))
+                        && !(getSpeelbord().getCellAt(p) instanceof noCandy) && !(getSpeelbord().getCellAt(pos) instanceof noCandy))
+                .toList();
+    }
+
+    public List<Position> longestMatchDown(Position pos){
+        Stream<Position> walked = pos.walkDown();
+        return walked
+                .takeWhile(p -> getSpeelbord().getCellAt(p).equals(getSpeelbord().getCellAt(pos))
+                        && !(getSpeelbord().getCellAt(p) instanceof noCandy) && !(getSpeelbord().getCellAt(pos) instanceof noCandy))
+                .toList();
+    }
+
+    public Set<List<Position>> findAllMatches(){
+        List<List<Position>> allMatches = Stream.concat(horizontalStartingPositions(), verticalStartingPositions())
+                .flatMap(p -> {
+                    List<Position> horizontalMatch = longestMatchToRight(p);
+                    List<Position> verticalMatch = longestMatchDown(p);
+                    return Stream.of(horizontalMatch, verticalMatch);
+                })
+                .filter(m -> m.size() > 2)
+                .sorted((match1, match2) -> match2.size() - match1.size())
+                .toList();
+        System.out.println(allMatches);
+
+        return allMatches.stream()
+                .filter(match -> allMatches.stream()
+                        .noneMatch(longerMatch -> longerMatch.size() > match.size() && new HashSet<>(longerMatch).containsAll(match)))
+                .collect(Collectors.toSet());
+    }
+    public void clearMatch(List<Position> match){
+        List<Position> copy = new ArrayList<>(match);
+
+        if(copy.isEmpty()) return;
+        Position first = copy.getFirst();
+        candyBoard.replaceCellAt(first, new noCandy()); // ZOU NULL WERKEN OF HEEFT DEZE EEN EMPTY CANDY TYPE NODIG??
+        System.out.println(copy);
+        copy.removeFirst();
+        clearMatch(copy);
+    }
+
+    public void fallDownto(List<Position> match){
+        if(horizontalMatch(match)){
+            match.forEach(this::fallDownTo);
+        } else {
+            match.stream()
+                    .min(Comparator.comparingInt(Position::row)).ifPresent(this::fallDownTo);
+        }
+    }
+
+    public void fallDownTo(Position pos){
+        try{
+            Position boven = new Position(pos.row() - 1, pos.col(), boardsize);
+            if(candyBoard.getCellAt(pos) instanceof noCandy){
+                candyBoard.replaceCellAt(pos, candyBoard.getCellAt(boven));
+                fallDownTo(boven);
+            } else{
+                fallDownTo(boven);
+            }
+        } catch (IllegalArgumentException ignored){
+            return;
+        }
+    }
+
+    public boolean horizontalMatch(List<Position> match){
+        return match.getFirst().row() == match.getLast().row();
+    }
+
+    public boolean updateBoard(){
+        Set<List<Position>> matches = findAllMatches();
+        System.out.println(horizontalStartingPositions().toList());
+        if (matches.isEmpty()) return false;
+
+        for(List<Position> match : matches){
+            System.out.println(match);
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        CandycrushModel model = new CandycrushModel("Speler", 3, 3);
+        Board<Candy> board = model.getSpeelbord();
+
+        List<Position> positionStream = model.horizontalStartingPositions().toList();
+        int a = 0;
+    }
+
 }

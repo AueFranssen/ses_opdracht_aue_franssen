@@ -1,6 +1,8 @@
 package be.kuleuven.candycrush;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Stream;
 
 public record Position(int row, int col, Boardsize boardsize) {
     public Position{
@@ -39,5 +41,28 @@ public record Position(int row, int col, Boardsize boardsize) {
         return true;
     }
     public boolean isLastColumn(){return col == boardsize.cols()-1;}
-
+    public Stream<Position> walkLeft(){
+        return this.boardsize.positions().stream()
+                .filter(p -> p.row() == this.row())
+                .filter(p -> p.col() <= this.col())
+                .sorted(Comparator.comparingInt(Position::col).reversed());
+    }
+    public Stream<Position> walkRight(){
+        return this.boardsize.positions().stream()
+                .filter(p -> p.row() == this.row())
+                .filter(p -> p.col() >= this.col())
+                .sorted(Comparator.comparingInt(Position::col));
+    }
+    public Stream<Position> walkUp(){
+        return this.boardsize.positions().stream()
+                .filter(p -> p.col() == this.col())
+                .filter(p -> p.row() <= this.row())
+                .sorted(Comparator.comparingInt(Position::row).reversed());
+    }
+    public Stream<Position> walkDown(){
+        return this.boardsize.positions().stream()
+                .filter(p -> p.col() == this.col())
+                .filter(p -> p.row() >= this.row())
+                .sorted(Comparator.comparingInt(Position::row));
+    }
     }
