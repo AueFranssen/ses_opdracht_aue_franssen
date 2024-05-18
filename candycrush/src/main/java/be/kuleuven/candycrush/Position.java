@@ -38,10 +38,6 @@ public record Position(int row, int col, Boardsize boardsize) {
         }
         return true;
     }
-    public boolean isLastColumn(){
-        if(col == boardsize.cols()){
-            return true;
-        }
-        else{return false;}
+    public boolean isLastColumn(){return col == boardsize.cols()-1;}
+
     }
-}

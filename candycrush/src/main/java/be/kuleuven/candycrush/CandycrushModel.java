@@ -51,17 +51,17 @@ public class CandycrushModel {
         return boardsize.rows();
     }
 
-    public  int getScore(){ return score; }
+    public  int getScore(){ return this.score; }
 
-    public boolean isLoggedIn(){ return loggedIn; }
+    public boolean isLoggedIn(){ return this.loggedIn; }
 
     public void goodLogIn(){
-        loggedIn = true;
+        this.loggedIn = true;
     }
 
     public void reset(){
-        score = 0;
-        loggedIn = false;
+        this.score = 0;
+        this.loggedIn = false;
     }
     public void candyWithIndexSelected(Position position){
         Iterable<Position> Neighbours = getSameNeighbourPositions(position);
