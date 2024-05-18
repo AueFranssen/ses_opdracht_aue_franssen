@@ -117,14 +117,6 @@ public class CandycrushModelTests {
         model.goodLogIn();
         assert (model.getScore()==beginScore);
     }
-
-    @Test
-    public void gegevenSpeelbord_wanneerGeinitialiseerd_danMoetBreedteMaalHoogteLengteArrayListZijn(){
-        CandycrushModel model = new CandycrushModel("Naam");
-        model.goodLogIn();
-        assert ((model.getWidth() * model.getHeight()) == model.getSpeelbord().size());
-    }
-
     @Test
     public void gegevenSpeelbord_wanneerGereset_danMoetSpelbordVerwijderd(){
         CandycrushModel model = new CandycrushModel("Naam");

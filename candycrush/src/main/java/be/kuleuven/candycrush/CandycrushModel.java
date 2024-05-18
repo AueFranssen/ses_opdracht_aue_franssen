@@ -2,24 +2,23 @@ package be.kuleuven.candycrush;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.Function;
 
 public class CandycrushModel {
     private String speler;
-    private ArrayList<Candy> speelbord;
+    private Board<Candy> candyBoard;
     private Boardsize boardsize;
     private int score;
     private boolean loggedIn;
 
     public CandycrushModel(String speler,int width,int height) {
         this.speler = speler;
-        speelbord = new ArrayList<>();
+        candyBoard = new Board<>(boardsize);
         boardsize = new Boardsize(width,height);
         score = 0;
         loggedIn = false;
-
-        for (int i = 0; i < width*height; i++){
-            speelbord.add(randomCandy());
-        }
+        Function<Position, Candy> candyCreator = position -> randomCandy();
+        candyBoard.fill(candyCreator);
     }
     public Candy randomCandy(){
         Random random = new Random();
@@ -40,8 +39,8 @@ public class CandycrushModel {
         return speler;
     }
     public Boardsize getBoardsize(){return boardsize;}
-    public ArrayList<Candy> getSpeelbord() {
-        return speelbord;
+    public Board<Candy> getSpeelbord() {
+        return candyBoard;
     }
 
     public int getWidth() {
@@ -72,11 +71,11 @@ public class CandycrushModel {
         }
         if(size > 2) {
             for (Position Neighbour : Neighbours) {
-                speelbord.set(Neighbour.toIndex(), randomCandy());
+                candyBoard.replaceCellAt(Neighbour, randomCandy());
                 score++;
             }
         }
-        speelbord.set(position.toIndex(), randomCandy());
+        candyBoard.replaceCellAt(position, randomCandy());
         score++;
     }
 
@@ -85,8 +84,8 @@ public class CandycrushModel {
         ArrayList<Position> result = new ArrayList<>();
 
         for(Position neighbor : neighbors){
-            Candy candy = speelbord.get(position.toIndex());
-            Candy neighborCandy = speelbord.get(neighbor.toIndex());
+            Candy candy = candyBoard.getCellAt(position);
+            Candy neighborCandy = candyBoard.getCellAt(neighbor);
             if(candy.equals(neighborCandy)){
                 result.add(neighbor);
             }

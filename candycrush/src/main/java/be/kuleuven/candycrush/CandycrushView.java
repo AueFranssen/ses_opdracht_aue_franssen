@@ -30,7 +30,7 @@ public class CandycrushView extends Region {
         if(model.isLoggedIn()) {
             int i = 0;
             int height = 0;
-            Iterator<Candy> iter = model.getSpeelbord().iterator();
+            Iterator<Candy> iter = model.getSpeelbord().getCells();
             while (iter.hasNext()) {
                 Candy candy = iter.next();
                 Rectangle rectangle = new Rectangle(i * widthCandy, height * heigthCandy, widthCandy, heigthCandy);
