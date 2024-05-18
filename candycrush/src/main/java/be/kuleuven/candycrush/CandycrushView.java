@@ -64,7 +64,7 @@ public class CandycrushView extends Region {
     }
     private Node makeCandyShape(Position position, Candy candy){
         return switch(candy) {
-            case Jawbreaker ignored -> makeRec(position, Color.WHITE);
+            case Jawbreaker ignored -> makeRec(position, Color.GRAY);
             case Worm ignored -> makeRec(position, Color.GREEN);
             case Cherry ignored -> makeRec(position, Color.RED);
             case Gumball ignored -> makeRec(position, Color.BLUE);
