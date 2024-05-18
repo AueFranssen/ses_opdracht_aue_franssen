@@ -63,6 +63,8 @@ public class CandycrushModel {
     public void reset(){
         this.score = 0;
         this.loggedIn = false;
+        Function<Position, Candy> candyCreator = position -> randomCandy();
+        candyBoard.fill(candyCreator);
     }
     public void candyWithIndexSelected(Position position){
         Iterable<Position> Neighbours = getSameNeighbourPositions(position);
@@ -140,13 +142,13 @@ public class CandycrushModel {
 
         if(copy.isEmpty()) return;
         Position first = copy.getFirst();
-        candyBoard.replaceCellAt(first, new noCandy()); // ZOU NULL WERKEN OF HEEFT DEZE EEN EMPTY CANDY TYPE NODIG??
-        System.out.println(copy);
+        candyBoard.replaceCellAt(first, new noCandy());
         copy.removeFirst();
+        score = score + 2;
         clearMatch(copy);
     }
 
-    public void fallDownto(List<Position> match){
+    public void fallDownTo(List<Position> match){
         if(horizontalMatch(match)){
             match.forEach(this::fallDownTo);
         } else {
@@ -159,8 +161,12 @@ public class CandycrushModel {
         try{
             Position boven = new Position(pos.row() - 1, pos.col(), boardsize);
             if(candyBoard.getCellAt(pos) instanceof noCandy){
+                while (candyBoard.getCellAt(boven) instanceof noCandy){
+                    boven =  new Position(boven.row() - 1, boven.col(), boardsize);
+                }
                 candyBoard.replaceCellAt(pos, candyBoard.getCellAt(boven));
-                fallDownTo(boven);
+                candyBoard.replaceCellAt(boven, new noCandy());
+                fallDownTo(pos);
             } else{
                 fallDownTo(boven);
             }
@@ -175,12 +181,14 @@ public class CandycrushModel {
 
     public boolean updateBoard(){
         Set<List<Position>> matches = findAllMatches();
-        System.out.println(horizontalStartingPositions().toList());
         if (matches.isEmpty()) return false;
 
         for(List<Position> match : matches){
-            System.out.println(match);
+            clearMatch(match);
+            fallDownTo(match);
         }
+
+        updateBoard();
         return true;
     }
 
