@@ -1,8 +1,5 @@
 package be.kuleuven.candycrush;
 
-import be.kuleuven.candycrush.Candy;
-import be.kuleuven.candycrush.CandycrushModel;
-import be.kuleuven.candycrush.Position;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Region;
@@ -11,7 +8,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 
-import java.util.Iterator;
+import java.util.Map;
 
 public class CandycrushView extends Region {
     private CandycrushModel model;
@@ -28,24 +25,15 @@ public class CandycrushView extends Region {
     public void update(){
         getChildren().clear();
         if(model.isLoggedIn()) {
-            int i = 0;
-            int height = 0;
-            Iterator<Candy> iter = model.getSpeelbord().getCells();
-            while (iter.hasNext()) {
-                Candy candy = iter.next();
-                Rectangle rectangle = new Rectangle(i * widthCandy, height * heigthCandy, widthCandy, heigthCandy);
+            Map<Position, Candy> cells = model.getSpeelbord().getCells();
+            Boardsize size = model.getBoardsize();
+            for (Position position : cells.keySet()){
+                Rectangle rectangle = new Rectangle(position.col() * widthCandy, position.row() * heigthCandy, widthCandy,heigthCandy);
                 rectangle.setFill(Color.TRANSPARENT);
                 rectangle.setStroke(Color.BLACK);
-                Position position = new Position(height, i, model.getBoardsize());
-                Node node = makeCandyShape(position, candy);
-                getChildren().addAll(rectangle, node);
 
-                if (i == model.getWidth() - 1) {
-                    i = 0;
-                    height++;
-                } else {
-                    i++;
-                }
+                Node node = makeCandyShape(position, model.getSpeelbord().getCellAt(position));
+                getChildren().addAll(rectangle,node);
             }
         }
     }

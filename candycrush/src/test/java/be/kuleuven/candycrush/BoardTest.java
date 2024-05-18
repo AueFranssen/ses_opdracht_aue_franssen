@@ -1,4 +1,4 @@
-package be.kuleuven.candycrush.model;
+package be.kuleuven.candycrush;
 
 import be.kuleuven.candycrush.Board;
 import be.kuleuven.candycrush.Boardsize;
