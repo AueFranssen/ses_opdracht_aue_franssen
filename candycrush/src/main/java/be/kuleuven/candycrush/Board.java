@@ -49,6 +49,17 @@ public class Board<E> {
         }
         return Collections.unmodifiableList(list);
     }
+    public void printBoard() {
+        for (int row = 0; row < boardsize.rows(); row++) {
+            for (int col = 0; col < boardsize.cols(); col++) {
+                Position position = new Position(row, col, boardsize);
+                E cell = getCellAt(position);
+                System.out.print(cell != null ? cell.toString() : " ");
+                System.out.print(" ");
+            }
+            System.out.println();
+        }
+    }
     @Override
     public synchronized boolean equals(Object o) {
         if (this == o) return true;

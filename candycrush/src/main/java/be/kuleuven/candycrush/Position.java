@@ -2,6 +2,7 @@ package be.kuleuven.candycrush;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 public record Position(int row, int col, Boardsize boardsize) {
@@ -20,7 +21,7 @@ public record Position(int row, int col, Boardsize boardsize) {
     }
     public Iterable<Position> neighbourPositions(){
         ArrayList<Position> neighbours = new ArrayList<>();
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1},{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
         for (int[] dir : directions) {
             int neighbourRow = row + dir[0];
             int neighbourCol = col + dir[1];
@@ -39,6 +40,10 @@ public record Position(int row, int col, Boardsize boardsize) {
             return false;
         }
         return true;
+    }
+    public boolean isNeighbor(Position pos){
+        List<Position> neighbors = (List<Position>) this.neighbourPositions();
+        return neighbors.contains(pos);
     }
     public boolean isLastColumn(){return col == boardsize.cols()-1;}
     public Stream<Position> walkLeft(){
@@ -65,4 +70,4 @@ public record Position(int row, int col, Boardsize boardsize) {
                 .filter(p -> p.row() >= this.row())
                 .sorted(Comparator.comparingInt(Position::row));
     }
-    }
+}
